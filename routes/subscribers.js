@@ -3,8 +3,17 @@ const router = express.Router();
 const Subscriber = require("../models/subscriber");
 
 // Create a subscriber
-router.post("/", (req, res) => {
-  res.send("Subscriber created");
+router.post("/", async (req, res) => {
+  const subscriber = new Subscriber({
+    name: req.body.name,
+    subscribedToChannel: req.body.subscribedToChannel,
+  });
+  try {
+    const newSubscriber = await subscriber.save();
+    res.status(201).json(newSubscriber);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
 // Read all subscribers
@@ -18,18 +27,39 @@ router.get("/", async (req, res) => {
 });
 
 // Read one subscriber by ID
-router.get("/:id", (req, res) => {
-  res.send(`Subscriber with ID ${req.params.id}`);
+router.get("/:id", getSubscriber, (req, res) => {
+  res.json(res.subscriber);
 });
 
 // Update a subscriber by ID
-router.patch("/:id", (req, res) => {
+router.patch("/:id", getSubscriber, (req, res) => {
   res.send(`Updated subscriber with ID ${req.params.id}`);
 });
 
 // Delete a subscriber by ID
-router.delete("/:id", (req, res) => {
-  res.send(`Deleted subscriber with ID ${req.params.id}`);
+router.delete("/:id", getSubscriber, async (req, res) => {
+  try {
+    await res.subscriber.deleteOne();
+    res.json({ message: "Deleted subscriber" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
+
+//Middleware
+
+async function getSubscriber(req, res, next) {
+  let subscriber;
+  try {
+    subscriber = await Subscriber.findById(req.params.id);
+    if (subscriber == null) {
+      return res.status(404).json({ message: "Cannot find subscriber" });
+    }
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+  res.subscriber = subscriber;
+  next();
+}
 
 module.exports = router;
