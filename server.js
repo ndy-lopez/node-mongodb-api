@@ -15,4 +15,4 @@ const subscribersRouter = require('./routes/subscribers')
 app.use('/subscribers', subscribersRouter);
 
 
-app.listen(3000, () => console.log("Server started"));
+app.listen(3000, () => console.log("Server started on port 3000"));
