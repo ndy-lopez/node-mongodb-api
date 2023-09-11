@@ -32,8 +32,19 @@ router.get("/:id", getSubscriber, (req, res) => {
 });
 
 // Update a subscriber by ID
-router.patch("/:id", getSubscriber, (req, res) => {
-  res.send(`Updated subscriber with ID ${req.params.id}`);
+router.patch("/:id", getSubscriber, async (req, res) => {
+  if (req.body.name != null) {
+    res.subscriber.name = req.body.name;
+  }
+  if (req.body.subscribedToChannel != null) {
+    res.subscriber.subscribedToChannel = req.body.subscribedToChannel;
+  }
+  try {
+    const updatedSubscriber = await res.subscriber.save();
+    res.json(updatedSubscriber);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
 // Delete a subscriber by ID

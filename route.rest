@@ -18,3 +18,12 @@ Content-Type: application/json
 ###
 
 DELETE http://localhost:3000/subscribers/64ff2d51b11509b1618e0868
+
+###
+
+PATCH  http://localhost:3000/subscribers/64ff2bc1de859a16b11e05c9
+Content-Type: application/json
+
+{
+  "name": "Amazing Person"
+}
